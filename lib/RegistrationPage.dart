@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'LoginPage.dart';
 import 'main.dart';
-
+import 'controller/signup_service.dart';
 class RegistrationPage extends StatefulWidget {
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -12,9 +12,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   String _selectedRole = 'Buyer'; // Default selected role
-
+  final SignupService _signupService = SignupService();
   // This method will be a placeholder now and won't perform any actual registration
-  void _register() {
+  void _register () async{
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Passwords do not match!'),
@@ -23,15 +23,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
       return;
     }
 
-    // Placeholder for successful registration
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Registration successful!'),
-      backgroundColor: Colors.green,
-    ));
+    try {
+      // Call the service to register the user
+      await _signupService.registerUser(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        role: _selectedRole,
+      );
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+      // Navigate to the login page upon successful registration
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Registration successful!'),
+        backgroundColor: Colors.green,
+      ));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.red,
+      ));
+    }
   }
 
   @override
