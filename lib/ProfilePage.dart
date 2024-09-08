@@ -1,6 +1,33 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'LoginPage.dart';
+
 class ProfilePage extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Logout function
+  Future<void> _logout(BuildContext context) async {
+    try {
+      await _auth.signOut();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Logged out successfully!'),
+        backgroundColor: Colors.green,
+      ));
+
+      // Navigate to login or splash screen after logout
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      ); // Adjust the route as needed
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to log out. Please try again.'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,9 +94,7 @@ class ProfilePage extends StatelessWidget {
           _buildProfileOption(
             icon: Icons.logout,
             title: 'Logout',
-            onTap: () {
-              // Handle logout logic here
-            },
+            onTap: () => _logout(context),
           ),
         ],
       ),
